@@ -76,35 +76,36 @@ void setup() {
 }
 
 /* 
-   loop
-   write to selected column -> LOW
-   set 
+   for each channel
+     write to selected column -> LOW
+     for each note in channel
+       set pinMode for note INPUT_PULLUP
+       delay for 10 ms 
+       read note
+       set pinMode for note OUTPUT
+       delay 500 ms
 */
 
-void stateful_read() {
+void update_keys() {
+  // key index
+  size_t k = 0;
   // channel select
   for( size_t i = 0; i < n_channels; i++) {
     digitalWrite(channel_select[i], LOW);
-    // note read
     for( size_t j=0; j < n_notes; j++) {
       pinMode(note_select[j], INPUT_PULLUP);
       delayMicroseconds(NOTE_PRE_READ_DELAY);
       
-//      if(digitalRead(note_select))
+      ks[k] = digitalRead(note_select[j]);
 
+      pinMode(note_select[j], OUTPUT);
+      digitalWrite(note_select[j], LOW);
+      k++;
       delayMicroseconds(NOTE_POST_READ_DELAY);
-
-      char current_pin_value = digitalRead(12);
-      if (current_pin_value != ks[i]) {
-        ks_prev[i] = current_pin_value;
-        #ifdef DEBUG 
-        print_pin(i);
-        #endif
-      }
     }
   }
 }
 
 void loop() {
-  stateful_read();
+  update_keys();
 }
